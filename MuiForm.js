@@ -29,6 +29,7 @@ const useMuiForm = (
       [name]: value,
     })), []);
 
+
   const formFields = useMemo(() => (
     initalFormProps.fields.map(item => (
       <TextField
@@ -47,34 +48,37 @@ const useMuiForm = (
     initalFormProps.handlers.submit(formData);
   }, [initalFormProps, formData]);
 
+  const formProps = useMemo(() => ({
+    onSubmit: submitForm
+  }), [submitForm]);
+
+  const submitButton = useMemo(() =>
+      <Button
+        type="submit"
+        {...initalFormProps.props.submitButton}
+      >
+        Submit
+      </Button>
+    , [initalFormProps]);
+
+  const form = useMemo(() =>
+      <form {...formProps}>
+        {formFields}
+        {submitButton}
+      </form>,
+    [formFields, formProps, submitButton]
+  );
+
   const api = useMemo(
     () => ({
       updateValues,
       updateValuesParams,
       setFormData,
-      formFields,
+      getFormFields: formFields,
     }),
     [updateValues, updateValuesParams, setFormData, formFields]
   );
-
-  const formProps = useMemo(() => ({
-    onSubmit: submitForm
-  }), [submitForm]);
-
-  const form = useMemo(() =>
-      <form {...formProps}>
-        {formFields}
-        <Button
-          type="submit"
-          {...initalFormProps.props.submitButton}
-        >
-          Submit
-        </Button>
-      </form>,
-    [formFields, formProps, initalFormProps]
-  );
-
-  return [form, formProps, api, formData];
+  return [form, formData, api];
 };
 
 export default useMuiForm;
