@@ -3,8 +3,16 @@ import { Button, TextField } from '@material-ui/core';
 
 const useMuiForm = (
   initialFormDataValue = {},
-  formInputs = { fields: [], props: {} },
-  submitHandler = () => false,
+  initalFormProps = {
+    fields: [],
+    props: {
+      fields: {},
+      submitButton: {}
+    },
+    handlers: {
+      submit: () => false,
+    }
+  },
 ) => {
   const [formData, setFormData] = useState(initialFormDataValue);
 
@@ -22,22 +30,22 @@ const useMuiForm = (
     })), []);
 
   const formFields = useMemo(() => (
-    formInputs.fields.map(item => (
+    initalFormProps.fields.map(item => (
       <TextField
         key={item.label}
         defaultValue={initialFormDataValue[item.name]}
         onChange={updateValues}
         {...item}
-        {...formInputs.props}
+        {...initalFormProps.props.fields}
       />
     ))
-  ), [updateValues, formInputs, initialFormDataValue]);
+  ), [updateValues, initalFormProps, initialFormDataValue]);
 
   const submitForm = useCallback(e => {
     e.preventDefault();
 
-    submitHandler(formData);
-  }, [submitHandler, formData]);
+    initalFormProps.handlers.submit(formData);
+  }, [initalFormProps, formData]);
 
   const api = useMemo(
     () => ({
@@ -58,14 +66,12 @@ const useMuiForm = (
         {formFields}
         <Button
           type="submit"
-          color="primary"
-          variant="contained"
-          fullWidth
+          {...initalFormProps.props.submitButton}
         >
-          Sign in
+          Submit
         </Button>
       </form>,
-    [formFields, formProps]
+    [formFields, formProps, initalFormProps]
   );
 
   return [form, formProps, api, formData];
